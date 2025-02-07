@@ -1,0 +1,24 @@
+.heading_navbar{
+    font-family: "Caladea", serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 40px;
+}
+.navbar{
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 10vw;
+    background-color: transparent;
+    height: 6vh;
+}
+ul{
+    display: flex;
+    margin-top: 15px;
+    width: 20vw;
+    justify-content: space-between;
+}
+li{
+    text-decoration: none;
+    list-style: none;
+    font-family: "Geist Sans";;
+}

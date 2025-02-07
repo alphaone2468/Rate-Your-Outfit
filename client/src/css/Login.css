@@ -1,0 +1,68 @@
+.login{
+    width: 100vw;
+    height: 91vh;
+    display: flex;
+}
+.partion1{
+    height: 91vh;
+    width: 50vw;
+    background: repeating-linear-gradient(45deg, #669, transparent 213px);
+    opacity: 0.4;
+}
+.partion2{
+    height: 91vh;
+    width: 50vw;
+    display: flex;
+    justify-content: center;
+}
+@media (max-width:900px) {
+    .partion1{
+        width: 40vw;
+    }
+    .partion2{
+        width: 60vw;
+    }
+}
+
+@media (max-width:600px) {
+    .partion1{
+        width: 0vw;
+    }
+    .partion2{
+        width: 100vw;
+    }
+}
+
+.login_content{
+    width: 70%;
+    display: flex;
+    flex-direction:column;
+    margin-top: 100px;
+}
+@media (max-width:600px) {
+    .login_content{
+        width: 80%;
+    }
+}
+.login_button{
+    height: 50px;
+    margin-top: 15px;
+    background-color: #669;
+    color: white;
+    font-family: "Open Sans", serif;
+    border: 0px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+input{
+    width: auto;
+    margin-bottom:30px;
+    font-family: "Geist Sans";
+}
+.signIn_login{
+    font-size: 40px;
+    text-align: center;
+    font-family: "Geist Sans";
+    font-weight: 500;
+    margin-bottom: 50px;
+}
