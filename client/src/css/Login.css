@@ -2,43 +2,27 @@
     width: 100vw;
     height: 91vh;
     display: flex;
-}
-.partion1{
-    height: 91vh;
-    width: 50vw;
-    background: repeating-linear-gradient(45deg, #669, transparent 213px);
-    opacity: 0.4;
+    background-color: whitesmoke;
 }
 .partion2{
     height: 91vh;
-    width: 50vw;
+    width: 100vw;
     display: flex;
     justify-content: center;
 }
-@media (max-width:900px) {
-    .partion1{
-        width: 40vw;
-    }
-    .partion2{
-        width: 60vw;
-    }
-}
-
-@media (max-width:600px) {
-    .partion1{
-        width: 0vw;
-    }
-    .partion2{
-        width: 100vw;
-    }
-}
 
 .login_content{
-    width: 70%;
+    width: 35%;
     display: flex;
     flex-direction:column;
     margin-top: 100px;
 }
+@media (max-width:1000px) {
+    .login_content{
+        width: 60%;
+    }
+}
+
 @media (max-width:600px) {
     .login_content{
         width: 80%;
@@ -62,7 +46,13 @@ input{
 .signIn_login{
     font-size: 40px;
     text-align: center;
-    font-family: "Geist Sans";
+    font-family: "Caladea", serif;
     font-weight: 500;
     margin-bottom: 50px;
+}
+.Sign_up_link{
+    text-align: center;
+    margin-top: 30px;
+    cursor: pointer;
+    font-family: "Geist Sans";
 }

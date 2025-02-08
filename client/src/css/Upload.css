@@ -1,0 +1,16 @@
+.uploadimg{
+    width: 100px;
+    height: 100px;
+}
+.upload{
+    background-color: whitesmoke;
+    height: 91vh;
+}
+.file_upload_text{
+    font-family: "Open Sans";
+    border: 3px dotted #669;
+    text-align: center;
+    padding: 100px 10px;
+    margin: 30px 230px;
+    border-radius: 20px;
+}
