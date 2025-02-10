@@ -5,6 +5,7 @@
 .upload{
     background-color: whitesmoke;
     height: 91vh;
+    padding: 30px;
 }
 .file_upload_text{
     font-family: "Open Sans";
@@ -13,4 +14,50 @@
     padding: 100px 10px;
     margin: 30px 230px;
     border-radius: 20px;
+}
+.upload_button{
+    height: 50px;
+    margin-top: 15px;
+    background-color: #669;
+    color: white;
+    font-family: "Open Sans", serif;
+    border: 0px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 30vw;
+}
+.uploadContainer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+@media (max-width:1200px) {
+    .upload_button{
+        width: 40vw;
+    }
+    .file_upload_text{
+        margin: 30px 150px;
+    }
+}
+@media (max-width:900px) {
+    .upload_button{
+        width: 50vw;
+    }
+    .file_upload_text{
+        margin: 30px 100px;
+    }
+    .upload{
+        padding: 30px 20px;
+    }
+}
+@media (max-width:600px) {
+    .upload_button{
+        width: 80vw;
+    }
+    .file_upload_text{
+        margin: 30px 20px;
+    }
+    .upload{
+        padding: 30px 10px;
+    }
 }

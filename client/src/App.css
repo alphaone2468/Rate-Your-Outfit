@@ -5,12 +5,13 @@
 body{
   margin: 0px;
   padding: 0px;
+  overflow-x:hidden;
 }
 .firstImage{
   position: relative;
   width: 100vw;
   height: 95vh;
-  filter: brightness(45%);
+  filter: brightness(35%);
   object-fit: cover;
   z-index: 0;
 
@@ -35,31 +36,55 @@ body{
   z-index: 2;
   color: white;
   top: 10px;
-  left: 15px;
+  left: 25px;
+  font-size: 34px;
 }
 .tagLine{
   color: white;
-  font-size: 40px;
+  font-size: 35px;
   margin-top: 50px;  
 }
 .tagLineText{
   font-size: 24px;
   line-height: 37px;
-  font-family: "Caladea", serif;
+  font-family: "Geist Sans", serif;
+  padding: 0px 300px;
+  color: white;
+}
+@media (max-width:900px) {
+  .tagLine{
+    font-size: 30px;
+  }
+  .tagLineText{
+    padding: 0px 100px;
+  }
+}
+
+@media (max-width:550px) {
+  .tagLine{
+    font-size: 20px;
+    margin-bottom: 30px;
+    padding: 0px 10px;
+  }
+  .tagLineText{
+    padding: 0px 20px;
+  }
 }
 .tagLineContainer{
-  margin-top: 50px;
+  margin-top: 1px;
 }
 .startNowButton{
   background-color: white;
   color: black;
-  padding: 10px 20px;
-  border-radius: 30px;
-  font-size: 20px;
+  padding: 10px 120px;
+  border-radius: 10px;
+  font-size: 16px;
   line-height: 25px;
   cursor: pointer;
   margin-top: 50px;
-  box-shadow: 1px 1px 10px black;
+  box-shadow: 5px 5px 10px #669;
+  border: 0px solid red;
+  font-family: "Open Sans";
 }
 .center{
   display: flex;
@@ -74,11 +99,25 @@ body{
   padding: 0px 50px;
   margin-bottom: 50px;
 }
+
 .featuresContent{
   margin-top: 20px;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-gap: 18px;
+}
+@media (max-width:1200px) {
+  .featuresContent{
+    grid-template-columns: 1fr 1fr;
+  }
+  .features{
+    padding: 0px 10px;
+  }
+}
+@media (max-width:700px) {
+  .featuresContent{
+    grid-template-columns: 1fr;
+  }
 }
 input{
   padding: 12px;
@@ -98,20 +137,25 @@ a{
   align-items: center;
   flex-direction: column;
   background-color: whitesmoke;
+  padding: 10px;
 }
 .box2{
   display: flex;
+  height: 300px;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   background-color: whitesmoke;
+  padding: 10px;
 }
 .box3{
+  height: 300px;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
   background-color: whitesmoke;
+  padding: 10px;
 }
 .featureHeading{
   font-size: 20px;
@@ -132,6 +176,7 @@ a{
   flex-direction: column;
 }
 .box2HIW{
+  height: 300px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -139,6 +184,7 @@ a{
 }
 .box3HIW{
   display: flex;
+  height: 300px;
   justify-content: center;
   align-items: center;
   flex-direction: column;
@@ -148,4 +194,81 @@ a{
   display: grid;
   grid-template-columns: 1fr 1fr ;
   grid-gap: 18px;
+}
+@media (max-width:700px){
+  .HIWContent{
+    grid-template-columns: 1fr;
+  }
+}
+.contact{
+  background-color: whitesmoke;
+  padding: 50px;
+}
+.contactInfo{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.contactInfo input{
+  width: 40vw;
+}
+.contactInfo textarea{
+  width: 40vw;
+  height: 100px;
+  padding: 12px;
+  font-family: "Geist Sans";
+}
+
+.contact h1{
+  margin-bottom: 20px;
+}
+.contact p{
+  margin-bottom: 20px;
+}
+.contactUsButton{
+  height: 50px;
+  margin-top: 15px;
+  background-color: #669;
+  color: white;
+  font-family: "Open Sans", serif;
+  border: 0px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 41.7vw;
+  padding: 15px;
+}
+@media (max-width:1000px) {
+  .contactInfo input{
+    width: 60vw;
+  }
+  .contactInfo textarea{
+    width: 60vw;
+  }
+  .contactUsButton{
+    width: 62vw;
+  }
+}
+
+@media (max-width:700px) {
+  .contactInfo input{
+    width: 80vw;
+  }
+  .contactInfo textarea{
+    width: 80vw;
+  }
+  .contactUsButton{
+    width: 83vw;
+  }
+}
+
+@media (max-width:600px) {
+  .contactUsButton{
+    width: 85vw;
+  }
+}
+@media (max-width:450px) {
+  .contactUsButton{
+    width: 87vw;
+  }
 }
