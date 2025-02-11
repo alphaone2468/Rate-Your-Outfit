@@ -46,7 +46,7 @@ const navbg = document.querySelector('.nav-bg');
   return (
       <div className='headingFont'>
           <div>
-              <img src={firstImage} alt="" className='firstImage' loading='lazy' />
+              <img src={firstImage} alt="" className='firstImage' />
           </div>
           <div className="headingContent">
                 <div className="headingInfo">

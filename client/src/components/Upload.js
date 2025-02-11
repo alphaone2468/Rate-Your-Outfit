@@ -3,6 +3,7 @@ import photo from "../images/one.jpg"
 import { Link } from 'react-router-dom'
 import '../css/Upload.css'
 import Navbar from './Navbar'
+import updateIcon from '../images/upload_icon.png'
 
 export default function About() {
   const [string,setstring]=useState("")
@@ -43,7 +44,7 @@ export default function About() {
       <h1 className='ta-c headingFont'>Upload Your Image</h1>
         <label htmlFor="file-upload" className='makecorrect'>
         <div className='file_upload_text'>
-          Choose A File
+          <img src={updateIcon} alt="" />
         </div>
         </label>
       <input type="file" name="ima" id="file-upload" accept='.jpg,.jepg,.png' onChange={callme} style={{"display":"none"}}/>

@@ -4,7 +4,7 @@
 }
 .upload{
     background-color: whitesmoke;
-    height: 91vh;
+    height: 83vh;
     padding: 30px;
 }
 .file_upload_text{
@@ -14,10 +14,11 @@
     padding: 100px 10px;
     margin: 30px 230px;
     border-radius: 20px;
+    cursor: pointer;
 }
 .upload_button{
     height: 50px;
-    margin-top: 15px;
+    margin: 20px;
     background-color: #669;
     color: white;
     font-family: "Open Sans", serif;

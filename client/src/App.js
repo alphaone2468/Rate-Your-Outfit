@@ -6,6 +6,7 @@ import Login from './components/Login';
 import Content from './components/Content';
 import SignUp from './components/SignUp';
 import Upload from './components/Upload';
+import Post from './components/Post';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route path='/content' element={<Content/>}/>
       <Route path='/signup' element={<SignUp/>}/>
       <Route path='/upload' element={<Upload/>}/>
+      <Route path='/post' element={<Post/>}/>
     </Routes>
 
     </>
