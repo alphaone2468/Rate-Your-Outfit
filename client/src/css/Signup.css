@@ -1,0 +1,48 @@
+.loginContainer{
+    height: calc(100vh - 60px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #F4F5FF;
+    padding-bottom: 100px;
+}
+.loginElementsContainer{
+}
+.loginElementsContainer div{
+    display: flex;
+    flex-direction: column;
+}
+.emailInput, .passwordInput, .usernameInput{
+    padding: 7px;
+    width: 350px;
+    border-radius: 5px;
+    border: 1.5px solid rgb(176, 176, 176);
+    padding: 13px;
+}
+.emailContainer, .passwordContainer, .usernameContainer{
+    margin-bottom: 20px;
+}
+.loginBtn{
+    padding: 13px 10px;
+    border: 0px solid;
+    background-color: #673DE6;
+    background-color: #669;
+    color: white;
+    font-weight: 700;
+    border-radius: 10px;
+    font-size: 16px;
+    margin-top: 7px;
+}
+.emailInput:focus{
+    outline: none;
+}
+.passwordInput:focus{
+    outline: none;
+}
+.usernameInput:focus{
+    outline: none;
+}
+label{
+    color: #595959;
+    margin-bottom: 5px;
+}

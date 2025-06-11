@@ -4,3 +4,18 @@
   box-sizing: border-box;
   font-family: "Roboto", sans-serif;
 }
+
+.heading{
+  font-family: 'Lato';
+}
+.hidden{
+  display:"none";
+}
+.flexCenter{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.error{
+  color: rgb(177, 77, 77);
+}

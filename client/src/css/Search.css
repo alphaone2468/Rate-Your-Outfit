@@ -1,0 +1,22 @@
+.searchContainer{
+    min-height: calc(100vh - 60px);
+    background-color: #F4F5FF;
+}
+.searchMainElement{
+    max-width: 800px;
+    margin: 0px auto;
+}
+.userNameContainer{
+    margin-bottom: 20px;
+}
+.userNameInput{
+    width: 95%;
+    border-radius: 5px;
+    border: 1.5px solid rgb(176, 176, 176);
+    padding: 13px;
+    padding-left: 50px;
+    margin: 20px;
+}
+.userNameInput:focus{
+    outline: none;
+}
