@@ -1,41 +1,64 @@
-import React, { useState } from 'react';
-import '../css/Signup.css';
-
+import React, { useState } from "react";
+import "../css/Signup.css";
+import { useNavigate } from "react-router-dom";
 export default function SignUp() {
-  const [userName, setUserName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const validate = () => {
     const newErrors = {};
 
     if (!userName.trim()) {
-      newErrors.userName = 'Username is required';
+      newErrors.userName = "Username is required";
     }
 
     if (!email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/^\S+@\S+\.\S+$/.test(email)) {
-      newErrors.email = 'Enter a valid email';
+      newErrors.email = "Enter a valid email";
     }
 
     if (!password.trim()) {
-      newErrors.password = 'Password is required';
+      newErrors.password = "Password is required";
     } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = "Password must be at least 6 characters";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
       // Proceed with signup logic
-      
+      const signupData = {
+        userName,
+        email,
+        password,
+      };
+
+      let data = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(signupData),
+      });
+      data = await data.json();
+      console.log(data);
+
+      if (data.status === "SUCCESS") {
+        navigate("/login");
+      } else {
+        // add toast
+        setErrors({ server: data.message || "Signup failed" });
+      }
     }
   };
 
@@ -86,6 +109,18 @@ export default function SignUp() {
             Sign Up
           </button>
         </div>
+
+        <p className="text-center" style={{ marginTop: "30px" }}>
+          Already have an account?{" "}
+          <span
+            style={{ color: "#b0306a", cursor: "pointer" }}
+            onClick={() => {
+              navigate("/login");
+            }}
+          >
+            Log In
+          </span>
+        </p>
       </form>
     </div>
   );

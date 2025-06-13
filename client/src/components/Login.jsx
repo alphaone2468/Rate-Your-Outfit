@@ -111,7 +111,15 @@ function Login() {
           </div>
 
           <p className="text-center" style={{ marginTop: "30px" }}>
-            Have an account
+            Dont have an account?{" "}
+            <span
+              style={{ color: "#b0306a", cursor: "pointer" }}
+              onClick={() => {
+                navigate("/signup");
+              }}
+            >
+              Sign Up
+            </span>
           </p>
         </form>
       </div>

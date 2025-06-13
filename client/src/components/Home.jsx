@@ -21,11 +21,11 @@ export default function Home() {
 
   useEffect(()=>{
     getProfile();
-  })
+  },[])
 
 
     const getProfile = async () => {
-      let data = await fetch("http://localhost:5000/profile", {
+      let data = await fetch("http://localhost:5000/isLoggedIn", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -40,10 +40,32 @@ export default function Home() {
       }
     }
 
-  const handleUserRated = (index, rating) => {
-    const updatedPosts = [...posts];
+  const handleUserRated = async (index, rating,postId) => {
+    let updatedPosts = [...posts];
     updatedPosts[index].userRating = rating;
-    setPosts(updatedPosts);
+    setPosts(() => { return updatedPosts });
+
+    let postData = await fetch("http://localhost:5000/addRating", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        postId: postId,
+        rating: rating,
+      }),
+      credentials: "include",
+    });
+    postData = await postData.json();
+    console.log(postData);
+
+    //update Live
+
+    updatedPosts=[...posts];
+    updatedPosts[index].overAllRatings = (updatedPosts[index].overAllRatings*updatedPosts[index].noOfRatings + rating) / (updatedPosts[index].noOfRatings + 1);
+    updatedPosts[index].noOfRatings += 1;
+    setPosts(() => { return updatedPosts });
+
   };
 
   return (
@@ -58,7 +80,7 @@ export default function Home() {
           <div className="overAllRating">
               <div className="ratingInfo">
                 <img src={star} alt="" className="star" />
-                <p>{post.overAllRatings}</p>
+                <p>{(post.overAllRatings.toString().length>1) ? post.overAllRatings.toFixed(1) : post.overAllRatings}</p>
                 <p>({post.noOfRatings})</p>
               </div>
           </div>
@@ -72,7 +94,7 @@ export default function Home() {
                   borderTopLeftRadius:"5px",
                   borderBottomLeftRadius:"5px"
                 }}
-                onClick={() => handleUserRated(index, i + 1)}
+                onClick={() => handleUserRated(index, i + 1,post._id)}
               >
                 {i+1}
               </p>

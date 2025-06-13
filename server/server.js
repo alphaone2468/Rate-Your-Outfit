@@ -37,7 +37,7 @@ function generateToken(req,res,next){
 
 app.post("/login", async(req, res) => {
     console.log(req.body);
-    let user=await User.findOne({email:req.body.email,password:req.body.password}).lean();
+    let user=await User.findOne({email:req.body.email,password:req.body.password},{password:0,profilePicture:0}).lean();
     if (user) {
         jwt.sign(user, process.env.JWT_SECRET, { expiresIn: 3000 }, (err, token) => {
             if (err) {
@@ -58,18 +58,17 @@ app.post("/login", async(req, res) => {
     }
 });
 
-console.log(process.env.PORT);
 
 
 
-app.get("/profile", (req, res) => {
+app.get("/isLoggedIn", (req, res) => {
     console.log("whatch this",req.cookies);
     jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
         if (err) {
             res.status(401).json({status:"FAILED",message:"Failed to verify Token please login"})
         }
         else {
-            res.status(200).json({status:"SUCCESS",data:data});
+            res.status(200).json({status:"SUCCESS",user:data});
         }
     })
 })
@@ -81,8 +80,7 @@ app.post("/signup",async(req,res)=>{
         let data=await new User(req.body);
         data=await data.save();
         console.log(data);
-
-        res.status(200).json({status:"SUCCESS",data});
+        res.status(201).json({status:"SUCCESS",user:data});
     }
     catch(e){
         console.log(error);
@@ -103,6 +101,22 @@ app.post("/signin",async(req,res)=>{
     catch(e){
         console.log(error);
         res.status(500).json({message:"Internal server error"});        
+    }
+})
+
+app.get("/profile/:id",async(req,res)=>{
+    try{
+        let user=await User.findById(req.params.id,{password:0});
+        if(user){
+            return res.status(200).json({status:"SUCCESS",user});
+        }
+        else{
+            return res.status(404).json({status:"FAILED",message:"User not found"});
+        }
+    }
+    catch(e){
+        console.log(e);
+        return res.status(500).json({status:"FAILED",message:"Internal Server Error"});
     }
 })
 
@@ -143,7 +157,56 @@ app.post("/addPost",async(req,res)=>{
     }
 })
 
+app.post("/addRating",async(req,res)=>{
+    console.log("rating",req.body);
+    try{
+        let post=await Post.findById(req.body.postId);
+        if(!post){
+            return res.status(404).json({message:"Post not found"});
+        }
+        post=post.toObject();
+        console.log("post",post.overAllRatings,post.noOfRatings);
+        let newOverallRatings = post.overAllRatings*post.noOfRatings + req.body.rating;
+        newOverallRatings = newOverallRatings / (post.noOfRatings + 1);
+        await Post.updateOne({_id:req.body.postId},{$set:{noOfRatings:post.noOfRatings+1,overAllRatings:newOverallRatings}});
+        return res.status(200).json({message:"Rating added successfully"});
+    }
+    catch(e){
+        console.log(e);
+        return res.status(500).json({message:"Internal Server Error"});
+    }
+})
 
+app.get("/userPosts",async(req,res)=>{
+    console.log("cookie",req.cookies.access_token);
+    let user;
+    jwt.verify(req.cookies.access_token,process.env.JWT_SECRET,(err,data)=>{
+        if(err){
+            console.log("err",err);
+            return res.status(401).json({status:"FAILED",message:"Failed to verify Token please login"});
+        }
+        else{
+            console.log("data",data);
+            req.user=data;
+        }
+    })
+    try{
+        let posts=await Post.find({userId:req.user._id});
+        return res.status(200).json({status:"SUCCESS",posts:posts});
+    }
+    catch(e){
+        return res.status(500).json({status:"FAILED",message:"Internal Server Error"});
+    }
+})
+
+app.get("/logout", (req, res) => {
+    res.clearCookie("access_token", {
+        httpOnly: true,
+        sameSite: "lax", 
+        secure: false
+    });
+    res.status(200).json({status:"SUCCESS",message:"Logged out successfully"});
+});
 
 app.listen(process.env.PORT, () => {
     console.log("Server running at Port ", process.env.PORT);

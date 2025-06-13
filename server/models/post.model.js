@@ -20,7 +20,7 @@ const postSchema = mongoose.Schema({
     noOfRatings:{
         type:Number,
         default:0
-    }
+    },
 })
 
 
