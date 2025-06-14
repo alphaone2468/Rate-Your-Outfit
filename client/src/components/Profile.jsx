@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { CgProfile } from "react-icons/cg";
 import star from "../css/star.png";
 import "../css/Profile.css";
+import { toast } from "react-toastify";
 export default function Profile() {
   const [posts, setPosts] = useState([]);
-  const [profileImg, setProfileImg] = useState();
+  const [user, setUser] = useState({});
+  const [showSaveButton, setShowSaveButton] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     async function getPosts() {
@@ -32,7 +34,6 @@ export default function Profile() {
 
   const getProfile = async () => {
     console.log(window.location.pathname.split("/").pop());
-    return;
     let data = await fetch(`http://localhost:5000/profile/${window.location.pathname.split("/").pop()}`, {
       method: "GET",
       headers: {
@@ -42,6 +43,9 @@ export default function Profile() {
     });
     data = await data.json();
     console.log(data);
+    if (data.status === "SUCCESS") {
+      setUser(data.user);
+    }
 
     if (data.status === "FAILED") {
       navigate("/login");
@@ -86,7 +90,8 @@ export default function Profile() {
     const file = e.target.files[0];
     const base64 = await convertToString(file);
     console.log(base64);
-    setProfileImg(base64);
+    setShowSaveButton(true);
+    setUser(({...user,profilePicture: base64}));
   };
 
   function convertToString(file) {
@@ -103,15 +108,50 @@ export default function Profile() {
     });
   }
 
+
+  const handleSaveProfileImage = async () => {
+    const res = await fetch("http://localhost:5000/updateProfilePicture", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        profilePicture: user.profilePicture,
+      }),
+      credentials: "include",
+    });
+    const data = await res.json();
+    console.log(data);
+    if (data.status === "SUCCESS") {
+       toast.success("Profile picture updated successfully", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+      });
+    } else {
+      toast.error("Failed to update profile picture", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  }
+
   return (
     <div className="HomeContainer">
       <div className="profileContainer">
         <div className="profileInfo">
           <div>
-            {/* <CgProfile style={{ fontSize: "100px" }} /> */}
-
             <img
-              src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+              src={user.profilePicture}
               alt=""
               width={50}
             />
@@ -123,10 +163,17 @@ export default function Profile() {
                 accept=".jpg,.jepg,.png"
                 onChange={handleChangeProfileImage}
               />
-              <p className="tc changeText">Change</p>
+              <p className="changeText">Change</p>
             </label>
+              {showSaveButton && <p className="changeText" onClick={handleSaveProfileImage} style={{ margin:"2px 30px" }}>Save</p>}
           </div>
-          <div className="followersDiv">
+          <div className="profileDetails">
+          <div className="userName">
+            <p className="userNameText">{user.userName}</p>
+            <button>Follow</button>
+          </div>
+          <div className="followDetails">
+            <div className="followersDiv">
             <p className="followers">Followers</p>
             <p className="followersCount tc ">0</p>
           </div>
@@ -134,9 +181,11 @@ export default function Profile() {
             <p className="following">Following</p>
             <p className="followingCount tc">0</p>
           </div>
+          </div>
+          </div>
         </div>
       </div>
-      <h1 className="heading">Your Posts</h1>
+      <h1 className="heading"> Posts</h1>
       {posts.map((post, index) => (
         <div className="post" key={index}>
           <div className="postHeader">

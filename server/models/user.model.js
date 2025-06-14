@@ -15,7 +15,15 @@ const userSchema = mongoose.Schema({
     },
     profilePicture:{
         type:String,
-        default:"https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+        default:"https://www.w3schools.com/howto/img_avatar.png"
+    },
+    followers:{
+        type:Array,
+        default:[]
+    },
+    following:{
+        type:Array,
+        default:[]
     }
 })
 

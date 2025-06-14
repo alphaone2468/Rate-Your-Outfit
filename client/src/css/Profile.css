@@ -61,15 +61,13 @@
     width: 100%;
 }
 .profileInfo{
-    border: 2px solid red;
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
     align-items: center;
     margin: 20px auto;
     max-width: 600px;
     width: 100vw;
     padding: 20px;
-    gap: 30px;
 }
 
 .profileInfo img{
@@ -123,4 +121,36 @@
     font-weight: 600;
     cursor: pointer;
     color: rgb(93, 92, 92);
+    margin-left: 25px;
+}
+.profileDetails{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    gap: 20px;
+}
+.followDetails{
+    display: flex;
+    gap: 20px;
+    padding: 10px;
+    border-radius: 6px;
+    justify-content: space-around;
+}
+.userName{
+    font-size: 20px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    left: 60px;
+}
+.userName button{
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    color: #b0306a;
+    font-weight: 600;
+    margin-left: 10px;
+    margin-top: 2px;
 }

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "../css/Login.css";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -53,10 +55,34 @@ function Login() {
       console.log(data);
 
       if(data.status==="SUCCESS"){
+        console.log("calling toasting");
+        toast.success("Login Successful", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
         navigate("/");
+      }
+      else if(data.status==="FAILED"){
+        toast.error(data.message, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
       }
     }
   };
+
+
+
 
   const getProfile = async () => {
     if (true) {

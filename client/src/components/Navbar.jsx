@@ -25,9 +25,6 @@ export default function Navbar() {
     }
   }
 
-  useEffect(() => {
-    currentLoginUser();
-  }, []);
 
   const currentLoginUser = async () => {
     let data = await fetch("http://localhost:5000/isLoggedIn", {
@@ -43,8 +40,7 @@ export default function Navbar() {
     if (data.status === "FAILED") {
       navigate("/login");
     } else {
-      setUser(data.user);
-      console.log("Current user:", data.user._id);
+      navigate(`/profile/${data.user._id}`);
     }
   }
 
@@ -57,7 +53,7 @@ export default function Navbar() {
             <Link to="/upload">Upload</Link>
           </li>
           <li>
-            <Link to={`profile/${user._id}`}>Profile</Link>
+            <p onClick={currentLoginUser}>Profile</p>
           </li>
           <li>
             <Link to="/">Home</Link>

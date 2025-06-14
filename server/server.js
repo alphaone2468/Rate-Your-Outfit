@@ -208,6 +208,71 @@ app.get("/logout", (req, res) => {
     res.status(200).json({status:"SUCCESS",message:"Logged out successfully"});
 });
 
+app.post("/updateProfilePicture", async (req, res) => {
+    console.log("cookie", req.cookies.access_token);
+    let user;
+    jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
+        if (err) {
+            console.log("err", err);
+            return res.status(401).json({ status: "FAILED", message: "Failed to verify Token please login" });
+        } else {
+            console.log("data", data);
+            req.user = data;
+        }
+    });
+    try {
+        await User.updateOne({ _id: req.user._id }, { $set: { profilePicture: req.body.profilePicture } });
+        return res.status(200).json({ status: "SUCCESS", message: "Profile picture updated successfully" });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ status: "FAILED", message: "Internal Server Error" });
+    }
+});
+
+
+app.post("/followUser", async (req, res) => {
+    console.log("cookie", req.cookies.access_token);
+    let user;
+    jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
+        if (err) {
+            console.log("err", err);
+            return res.status(401).json({ status: "FAILED", message: "Failed to verify Token please login" });
+        } else {
+            console.log("data", data);
+            req.user = data;
+        }
+    });
+    try {
+        await User.updateOne({ _id: req.user._id }, { $addToSet: { following: req.body.followingId } });
+        await User.updateOne({ _id: req.body.followingId }, { $addToSet: { followers: req.user._id } });
+        return res.status(200).json({ status: "SUCCESS", message: "User followed successfully" });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ status: "FAILED", message: "Internal Server Error" });
+    }
+});
+app.post("/unfollowUser", async (req, res) => {
+    console.log("cookie", req.cookies.access_token);
+    let user;
+    jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
+        if (err) {
+            console.log("err", err);
+            return res.status(401).json({ status: "FAILED", message: "Failed to verify Token please login" });
+        } else {
+            console.log("data", data);
+            req.user = data;
+        }
+    });
+    try {
+        await User.updateOne({ _id: req.user._id }, { $pull: { following: req.body.followingId } });
+        await User.updateOne({ _id: req.body.followingId }, { $pull: { followers: req.user._id } });
+        return res.status(200).json({ status: "SUCCESS", message: "User unfollowed successfully" });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ status: "FAILED", message: "Internal Server Error" });
+    }
+});
+
 app.listen(process.env.PORT, () => {
     console.log("Server running at Port ", process.env.PORT);
 });
