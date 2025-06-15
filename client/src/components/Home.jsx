@@ -73,8 +73,11 @@ export default function Home() {
       {posts.map((post, index) => (
         <div className="post" key={index}>
           <div className="postHeader">
-            <CgProfile style={{ fontSize: "30px" }} />
-            <p>{post.userName}</p>
+            <img src={post.userId.resizedProfilePicture} alt="" className="postProfilePicture" />
+            <p onClick={() => 
+              navigate(`/profile/${post.userId._id}`)}
+              style={{ cursor: "pointer" }}
+            >{post.userId.userName}</p>
           </div>
           <img src={post.image} alt="" className="postImage" />
           <div className="overAllRating">
@@ -90,7 +93,7 @@ export default function Home() {
                 key={i}
                 className="ratingElement text-center"
                 style={{
-                  backgroundColor: post.userRating>=i+1?"#e7e0ff":"",
+                  backgroundColor: post.userRating>=i+1?"#ffadd2":"",
                   borderTopLeftRadius:"5px",
                   borderBottomLeftRadius:"5px"
                 }}

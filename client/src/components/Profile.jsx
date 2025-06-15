@@ -4,14 +4,19 @@ import { CgProfile } from "react-icons/cg";
 import star from "../css/star.png";
 import "../css/Profile.css";
 import { toast } from "react-toastify";
+import { useLocation } from 'react-router-dom';
 export default function Profile() {
   const [posts, setPosts] = useState([]);
   const [user, setUser] = useState({});
   const [showSaveButton, setShowSaveButton] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [loginUser, setLoginUser] = useState({});
   const navigate = useNavigate();
+  const location = useLocation();
   useEffect(() => {
     async function getPosts() {
-      const res = await fetch("http://localhost:5000/userPosts", {
+      console.log("Current Path:", location.pathname.slice(9,));
+      const res = await fetch(`http://localhost:5000/userPosts/${window.location.pathname.split("/").pop()}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -25,12 +30,51 @@ export default function Profile() {
       setPosts(updatedPosts);
     }
     getPosts();
-  }, []);
+  }, [location.pathname]);
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+    });
+  }, [location.pathname]);
+
+  useEffect(() => {
+    currentLoginUser();
+  },[]);
+  
+  const currentLoginUser= async() => {
+    let data = await fetch("http://localhost:5000/isLoggedIn", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    data = await data.json();
+    if (data.status === "SUCCESS") {
+      console.log("User is logged in",data.user);
+      let profile= await fetch(`http://localhost:5000/profile/${data.user._id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      profile = await profile.json();
+      if (profile.status === "SUCCESS") {
+        setLoginUser(profile.user);
+        console.log("Profile fetched successfully",profile.user);
+        console.log("have alook",window.location.pathname.split("/").pop());
+        if(profile.user.following.includes(window.location.pathname.split("/").pop())){
+          setIsFollowing(true);
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     getProfile();
-  }, []);
+  }, [location.pathname]);
 
   const getProfile = async () => {
     console.log(window.location.pathname.split("/").pop());
@@ -145,6 +189,42 @@ export default function Profile() {
     }
   }
 
+  const handleFollowUser = async () => {
+    const res = await fetch("http://localhost:5000/followUser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        followingId: user._id,
+      }),
+      credentials: "include",
+    });
+    const data = await res.json();
+    console.log(data);
+    if (data.status === "SUCCESS") {
+      toast.success("User followed successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    } else {
+      toast.error("Failed to follow user", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  }
+
   return (
     <div className="HomeContainer">
       <div className="profileContainer">
@@ -160,26 +240,30 @@ export default function Profile() {
                 type="file"
                 id="profilePicture"
                 style={{ display: "none" }}
-                accept=".jpg,.jepg,.png"
                 onChange={handleChangeProfileImage}
               />
-              <p className="changeText">Change</p>
+              {(loginUser._id === user._id) && <p className="changeText">Change</p>}
             </label>
               {showSaveButton && <p className="changeText" onClick={handleSaveProfileImage} style={{ margin:"2px 30px" }}>Save</p>}
           </div>
           <div className="profileDetails">
           <div className="userName">
             <p className="userNameText">{user.userName}</p>
-            <button>Follow</button>
+            
+            {(loginUser._id !== user._id) ? 
+              <button onClick={handleFollowUser}>
+                {isFollowing ? "following" : "Follow"}
+              </button> : <p></p>
+            }
           </div>
           <div className="followDetails">
             <div className="followersDiv">
             <p className="followers">Followers</p>
-            <p className="followersCount tc ">0</p>
+            <p className="followersCount tc ">{user.followers?.length}</p>
           </div>
           <div className="followingDiv">
             <p className="following">Following</p>
-            <p className="followingCount tc">0</p>
+            <p className="followingCount tc">{user.following?.length}</p>
           </div>
           </div>
           </div>

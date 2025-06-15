@@ -17,6 +17,10 @@ const userSchema = mongoose.Schema({
         type:String,
         default:"https://www.w3schools.com/howto/img_avatar.png"
     },
+    resizedProfilePicture:{
+        type:String,
+        default:"https://www.w3schools.com/howto/img_avatar.png"
+    },
     followers:{
         type:Array,
         default:[]

@@ -2,9 +2,14 @@ import { useState } from "react";
 import "../css/Upload.css";
 import { MdOutlineDriveFolderUpload } from "react-icons/md";
 import { CiCircleRemove } from "react-icons/ci";
+import { toast } from "react-hot-toast";
 
 export default function Upload() {
   const [img,setImg]=useState("");
+  const [loading,setLoading]=useState(false);
+  const [uploadBtnStyle,setUploadBtnStyle]=useState({
+      boxShadow:"6px 6px black",
+    })
   const handlePreviewImage = async(e) =>{
     const file=e.target.files[0];
     const base64=await convertToString(file);
@@ -31,8 +36,12 @@ const handleRemoveImg=()=>{
 }
 
 const handleUploadImage = async()=>{
-  console.log("calling");
-
+  setUploadBtnStyle(()=>{return {boxShadow:"0px 0px black",transform:"translate(5px,5px)"}});
+    
+  setTimeout(()=>{
+    setUploadBtnStyle(()=>{return {boxShadow:"6px 6px black"}});
+    },100)
+  setLoading(true);
   let imgData={
     userId:"123",
     userName:"test",
@@ -49,6 +58,17 @@ const handleUploadImage = async()=>{
   data = await data.json();
 
   console.log(data);
+  setLoading(false);
+
+  if(data.status==="SUCCESS"){
+    console.log("Post created successfully");
+    setImg("");
+    toast.success("Image uploaded successfully");
+  }
+  else{
+    toast.error("Failed to upload image");
+  }
+
 }
   return (
     <div className="uploadContainer">
@@ -59,7 +79,7 @@ const handleUploadImage = async()=>{
           <div className="content">
             <div className="uploadIconContainer">
               <label htmlFor="file-upload" className="uploadIcon">
-                <input type="file" id="file-upload" accept='.jpg,.jepg,.png' onChange={handlePreviewImage} style={{display:"none"}}/>
+                <input type="file" id="file-upload" onChange={handlePreviewImage} style={{display:"none"}}/>
                 <MdOutlineDriveFolderUpload
                   style={{ color: "#669", fontSize: "40px" }}
                 />
@@ -88,7 +108,9 @@ const handleUploadImage = async()=>{
       </div>
       {(img) && 
       <div className="uploadBtnContainer">
-        <button className="uploadBtn" onClick={handleUploadImage}>Upload </button>
+        <button className="uploadBtn cp" onClick={handleUploadImage} style={uploadBtnStyle}>
+          {loading ? "Uploading..." : "Upload"}
+        </button>
       </div>
       }
     </div>
