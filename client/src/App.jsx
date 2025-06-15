@@ -24,7 +24,7 @@ function App() {
           success: {
             duration: 3000,
             theme: {
-              primary: '#4aed88',
+              primary: '#4aed89',
             },
           },
         }}
