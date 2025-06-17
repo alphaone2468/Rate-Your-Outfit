@@ -9,6 +9,7 @@ import Profile from './components/Profile'
 import 'react-toastify/dist/ReactToastify.css';
 import {Routes,Route,Link} from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
+import Comments from './components/Comments'
 function App() {
 
   return (
@@ -18,8 +19,13 @@ function App() {
         reverseOrder={false}
         toastOptions={{
           style: {
-            background: '#363636',
-            color: '#fff',
+            // some dark green color
+            padding: '10px 35px',
+            fontSize: '17px',
+            fontFamily: 'Lato, sans-serif',
+            boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
+            borderRadius: '8px',
+            backgroundColor: 'lightgray', //more light color
           },
           success: {
             duration: 3000,
@@ -39,6 +45,7 @@ function App() {
         <Route path='/upload' element={<Upload/>}/>
         <Route path='/search' element={<Search/>}/>
         <Route path='/profile/:id' element={<Profile/>}/>
+        <Route path='/comments/:id' element={<Comments/>}/>
       </Routes>
 
 

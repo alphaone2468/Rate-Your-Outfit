@@ -55,28 +55,11 @@ function Login() {
       console.log(data);
 
       if(data.status==="SUCCESS"){
-        console.log("calling toasting");
-        toast.success("Login Successful", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        toast.success("Login Successful");
         navigate("/");
       }
       else if(data.status==="FAILED"){
-        toast.error(data.message, {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
+        toast.error(data.message);
       }
     }
   };

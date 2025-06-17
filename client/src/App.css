@@ -25,3 +25,7 @@
 .cp{
   cursor: pointer;
 }
+label{
+    color: #595959;
+    margin-bottom: 5px;
+}

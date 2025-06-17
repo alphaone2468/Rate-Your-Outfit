@@ -106,3 +106,9 @@
     border-radius: 50%;
     object-fit: cover;
 }
+.commentsText{
+    cursor: pointer;
+    color: #b0306a;
+    font-weight: 500;
+    margin: 10px 20px;
+}

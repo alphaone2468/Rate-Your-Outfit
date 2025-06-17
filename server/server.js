@@ -304,6 +304,48 @@ app.post('/upload-base64', async (req, res) => {
     }
 });
 
+//comments
+
+app.get("/getComments/:postId", async (req, res) => {
+    try {
+        //want to poulate userId as well
+        let post = await Post.findById(req.params.postId).populate("comments.userId", "userName resizedProfilePicture").populate("userId", "userName resizedProfilePicture");
+        if (!post) {
+            return res.status(404).json({ status: "FAILED", message: "Post not found" });
+        }
+        return res.status(200).json({ status: "SUCCESS", comments: post.comments, post: post });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ status: "FAILED", message: "Internal Server Error" });
+    }
+});
+
+app.post("/addComment", async (req, res) => {
+    console.log("cookie", req.cookies.access_token);
+    let user;
+    jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
+        if (err) {
+            console.log("err", err);
+            return res.status(401).json({ status: "FAILED", message: "Failed to verify Token please login" });
+        } else {
+            console.log("data", data);
+            req.user = data;
+        }
+    });
+    try {
+        let post = await Post.findById(req.body.postId);
+        if (!post) {
+            return res.status(404).json({ status: "FAILED", message: "Post not found" });
+        }
+        post.comments.push({ userId: req.user._id, comment: req.body.comment });
+        await post.save();
+        return res.status(200).json({ status: "SUCCESS", message: "Comment added successfully" });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ status: "FAILED", message: "Internal Server Error" });
+    }
+});
+
 
 
 app.listen(process.env.PORT, () => {

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "../css/Home.css";
-import { CgProfile } from "react-icons/cg";
 import star from "../css/star.png";
 import { useNavigate } from "react-router-dom";
 
@@ -103,6 +102,8 @@ export default function Home() {
               </p>
             ))}
           </div>
+
+          <p onClick={() => navigate(`/comments/${post._id}`)} className="commentsText">See comments</p>
         </div>
       ))}
     </div>
