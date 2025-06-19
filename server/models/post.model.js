@@ -17,6 +17,18 @@ const commentsSchema = mongoose.Schema({
     }
 },{_id: false});
 
+const ratingSchema = mongoose.Schema({
+    userId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
+        required:true
+    },
+    rated:{
+        type:Number,
+        required:true
+    }
+},{_id:false});
+
 const postSchema = mongoose.Schema({
     userId:{
         type:mongoose.Schema.Types.ObjectId,
@@ -39,6 +51,11 @@ const postSchema = mongoose.Schema({
         type:Number,
         default:0
     },
+    ratings:[
+        {
+            type:ratingSchema
+        }
+    ],
     comments:[
         {
             type:commentsSchema

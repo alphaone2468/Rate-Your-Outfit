@@ -126,14 +126,45 @@ app.get("/profile/:id", async (req, res) => {
 
 app.get("/getPost", async (req, res) => {
     try {
-        const posts = await Post.find().populate("userId","userName resizedProfilePicture").limit(10);
+        console.log("cookie", req.cookies.access_token);
+        let user;
+        jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
+            if (err) {
+                console.log("err", err);
+                return res.status(401).json({ status: "FAILED", message: "Failed to verify Token please login" });
+            } else {
+                console.log("data", data);
+                req.user = data;
+            }
+        });
+        console.log(req.user);
+        const posts = await Post.find().populate("userId", "userName resizedProfilePicture").limit(10);
+
+        for (let i = 0; i < posts.length; i++) {
+            const postObj = posts[i].toObject();
+
+            const userRatedObj = postObj.ratings.find(
+                (e) => e.userId.toString() === req.user._id.toString()
+            );
+            postObj.userRated = userRatedObj ? userRatedObj.rated : 0;
+
+            const ratings = postObj.ratings.map((r) => r.rated);
+            postObj.avgRating = ratings.length > 0
+                ? (ratings.reduce((a, b) => a + b, 0) / ratings.length)
+                : 0;
+
+            posts[i] = postObj;
+        }
+
         return res.status(200).json(posts);
 
-    }
-    catch (e) {
+
+    } catch (e) {
+        console.error(e);
         return res.status(500).json({ message: "Internal Server Error" });
     }
-})
+});
+
 app.post("/addPost", async (req, res) => {
     // console.log(req.body);
     console.log("cookie", req.cookies.access_token);
@@ -159,31 +190,41 @@ app.post("/addPost", async (req, res) => {
     }
 })
 
-app.post("/addRating", async (req, res) => {
-    console.log("rating", req.body);
-    try {
-        let post = await Post.findById(req.body.postId);
-        if (!post) {
-            return res.status(404).json({ message: "Post not found" });
-        }
-        post = post.toObject();
-        console.log("post", post.overAllRatings, post.noOfRatings);
-        let newOverallRatings = post.overAllRatings * post.noOfRatings + req.body.rating;
-        newOverallRatings = newOverallRatings / (post.noOfRatings + 1);
-        await Post.updateOne({ _id: req.body.postId }, { $set: { noOfRatings: post.noOfRatings + 1, overAllRatings: newOverallRatings } });
-        return res.status(200).json({ message: "Rating added successfully" });
-    }
-    catch (e) {
-        console.log(e);
-        return res.status(500).json({ message: "Internal Server Error" });
-    }
-})
 
 app.get("/userPosts/:id", async (req, res) => {
+    console.log("cookie", req.cookies.access_token);
+    jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
+        if (err) {
+            console.log("err", err);
+        }
+        else {
+            console.log("data", data);
+            req.user = data;
+        }
+    })
     try {
-        console.log("bkdnbdj", req.params.id);
         let posts = await Post.find({ userId: req.params.id });
         console.log("posts", posts);
+
+        for (let i = 0; i < posts.length; i++) {
+            let postObj = posts[i].toObject();
+            delete postObj.__v;
+            delete postObj.comments;
+
+            const userRatedObj = postObj.ratings.find(
+                (e) => e.userId.toString() === req.user._id.toString()
+            );
+            postObj.userRated = userRatedObj ? userRatedObj.rated : 0;
+
+            const ratings = postObj.ratings.map((r) => r.rated);
+            postObj.avgRating = ratings.length > 0
+                ? (ratings.reduce((a, b) => a + b, 0) / ratings.length)
+                : 0;
+
+            posts[i] = postObj;
+        }
+
+
         return res.status(200).json({ status: "SUCCESS", posts: posts });
     }
     catch (e) {
@@ -345,6 +386,47 @@ app.post("/addComment", async (req, res) => {
         return res.status(500).json({ status: "FAILED", message: "Internal Server Error" });
     }
 });
+
+
+app.post("/addRating", async (req, res) => {
+    try {
+        console.log("cookie", req.cookies.access_token);
+        let user;
+        jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
+            if (err) {
+                console.log("err", err);
+                return res.status(401).json({ status: "FAILED", message: "Failed to verify Token please login" });
+            } else {
+                console.log("data", data);
+                req.user = data;
+            }
+        });
+        const post = await Post.findOne({ _id: req.body.postId }, { ratings: 1 });
+        const userIds = post.ratings.map((e) => e.userId.toString());
+
+        if (userIds.includes(req.user._id.toString())) {
+            await Post.updateOne(
+                { _id: req.body.postId, "ratings.userId": req.user._id },
+                { $set: { "ratings.$.rated": req.body.rating } }
+            );
+        } else {
+            const ratingElement = {
+                userId: req.user._id,
+                rated: req.body.rating,
+            };
+            await Post.updateOne(
+                { _id: req.body.postId },
+                { $push: { ratings: ratingElement } }
+            );
+        }
+
+        res.status(200).json({ status: "SUCCESS", message: "Rating saved" });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ status: "FAILED", message: "Internal Server Error" });
+    }
+});
+
 
 
 
