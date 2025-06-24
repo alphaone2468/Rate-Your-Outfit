@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../css/Login.css";
+import "../styles/Login.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 
@@ -43,7 +43,7 @@ function Login() {
     },100)
     const validateData = validate();
     if (validateData) {
-      let data = await fetch("http://localhost:5000/login", {
+      let data = await fetch("http://localhost:5000/api/user/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -69,7 +69,7 @@ function Login() {
 
   const getProfile = async () => {
     if (true) {
-      let data = await fetch("http://localhost:5000/profile", {
+      let data = await fetch("http://localhost:5000/api/user/profile", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

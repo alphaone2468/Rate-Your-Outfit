@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../css/Upload.css";
+import "../styles/Upload.css";
 import { MdOutlineDriveFolderUpload } from "react-icons/md";
 import { CiCircleRemove } from "react-icons/ci";
 import { toast } from "react-hot-toast";
@@ -12,6 +12,10 @@ export default function Upload() {
     })
   const handlePreviewImage = async(e) =>{
     const file=e.target.files[0];
+    if(file.size > 10*1024*1024){ 
+      toast.error("File size exceeds 10MB limit");
+      return;
+    }
     const base64=await convertToString(file);
     console.log(base64);
     setImg(base64);
@@ -47,7 +51,7 @@ const handleUploadImage = async()=>{
     userName:"test",
     image:img
   }
-  let data = await fetch("http://localhost:5000/addPost",{
+  let data = await fetch("http://localhost:5000/api/post/addPost",{
     method:"POST",
     body:JSON.stringify(imgData),
     credentials:"include",

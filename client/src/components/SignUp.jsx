@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../css/Signup.css";
+import "../styles/Signup.css";
 import { useNavigate } from "react-router-dom";
 export default function SignUp() {
   const [userName, setUserName] = useState("");
@@ -42,7 +42,7 @@ export default function SignUp() {
         password,
       };
 
-      let data = await fetch("http://localhost:5000/signup", {
+      let data = await fetch("http://localhost:5000/api/user/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

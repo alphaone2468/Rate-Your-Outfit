@@ -1,9 +1,9 @@
 import { useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
-import "../css/Comments.css";
+import "../styles/Comments.css";
 import { useNavigate } from "react-router-dom";
-import star from "../css/star.png";
+import star from "../styles/star.png";
 
 export default function Comments() {
   const location = useLocation();
@@ -14,6 +14,7 @@ export default function Comments() {
     boxShadow: "6px 6px black",
   });
   const [post, setPost] = useState({});
+  const [user, setUser] = useState({});
   const navigate = useNavigate();
 
   const [text, setText] = useState("");
@@ -28,14 +29,53 @@ export default function Comments() {
   }, [text]);
 
   useEffect(() => {
+    getProfile();
+  }, []);
+
+  const getProfile = async () => {
+    let data = await fetch("http://localhost:5000/api/user/isLoggedIn", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    data = await data.json();
+    console.log(data);
+    if (data.status === "SUCCESS") {
+      let profile = await fetch(
+        `http://localhost:5000/api/user/profile/${data.user._id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      profile = await profile.json();
+      if (profile.status === "SUCCESS") {
+        console.log(profile);
+        setUser(profile.user);
+      }
+      if (data.status === "FAILED") {
+        navigate("/login");
+      }
+    }
+  };
+
+  useEffect(() => {
     const fetchComments = async () => {
       const response = await fetch(
-        `http://localhost:5000/getComments/${postId}`
+        `http://localhost:5000/api/post/getComments/${postId}`
       );
       const data = await response.json();
       if (data.status === "SUCCESS") {
-        setComments(data.post.comments);
-        console.log(data.post.comments);
+        const sortedComments = [...data.post.comments].sort((a, b) => {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        setComments(sortedComments);
         setPost(data.post);
       } else {
         toast.error(data.message);
@@ -60,7 +100,7 @@ export default function Comments() {
       setShowError(true);
       return;
     }
-    const response = await fetch("http://localhost:5000/addComment", {
+    const response = await fetch("http://localhost:5000/api/post/addComment", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -71,7 +111,7 @@ export default function Comments() {
     const data = await response.json();
     if (data.status === "SUCCESS") {
       setComments([
-        { userId: { userName: "You" }, comment: text },
+        { userId: { userName: user.userName, resizedProfilePicture: user.resizedProfilePicture }, comment: text, createdAt: new Date() },
         ...comments,
       ]);
       setText("");
@@ -81,33 +121,32 @@ export default function Comments() {
     }
   };
 
-const daysHappenedSinceCommented = (createdAt) => {
-  createdAt = new Date(createdAt);
-  if (isNaN(createdAt)) return "Invalid date";
+  const daysHappenedSinceCommented = (createdAt) => {
+    createdAt = new Date(createdAt);
+    if (isNaN(createdAt)) return "Invalid date";
 
-  const now = new Date();
-  const seconds = (now - createdAt) / 1000;
+    const now = new Date();
+    const seconds = (now - createdAt) / 1000;
 
-  if (seconds < 60) {
-    const s = Math.floor(seconds);
-    return `${s} second${s !== 1 ? 's' : ''} ago`;
-  } else if (seconds < 60 * 60) {
-    const m = Math.floor(seconds / 60);
-    return `${m} minute${m !== 1 ? 's' : ''} ago`;
-  } else if (seconds < 24 * 60 * 60) {
-    const h = Math.floor(seconds / (60 * 60));
-    return `${h} hour${h !== 1 ? 's' : ''} ago`;
-  } else {
-    const d = Math.floor(seconds / (24 * 60 * 60));
-    return `${d} day${d !== 1 ? 's' : ''} ago`;
-  }
-};
-
+    if (seconds < 60) {
+      const s = Math.floor(seconds);
+      return `${s} second${s !== 1 ? "s" : ""} ago`;
+    } else if (seconds < 60 * 60) {
+      const m = Math.floor(seconds / 60);
+      return `${m} minute${m !== 1 ? "s" : ""} ago`;
+    } else if (seconds < 24 * 60 * 60) {
+      const h = Math.floor(seconds / (60 * 60));
+      return `${h} hour${h !== 1 ? "s" : ""} ago`;
+    } else {
+      const d = Math.floor(seconds / (24 * 60 * 60));
+      return `${d} day${d !== 1 ? "s" : ""} ago`;
+    }
+  };
 
   return (
     <div className="commentsContainer">
       <div className="commentsElementsContainer">
-        <div className="post" style={{paddingBottom:"6px"}}>
+        <div className="post" style={{ paddingBottom: "6px" }}>
           <div className="postHeader">
             <img
               src={post?.userId?.resizedProfilePicture}
@@ -154,15 +193,25 @@ const daysHappenedSinceCommented = (createdAt) => {
           </div>
         </form>
         <div className="userComments">
-        {comments.map((comment) => (
-          <div key={comment._id} className="commentElement">
-            <img src={comment.userId.resizedProfilePicture} alt="" className="postProfilePicture" />
-            <div>
-            <p style={{fontWeight:"500",marginBottom:"3px"}}>@{comment.userId.userName}  <span style={{color:"#595959"}}> {daysHappenedSinceCommented(comment.createdAt)}</span></p>
-            <p>{comment.comment}</p>
+          {comments.map((comment) => (
+            <div key={comment._id} className="commentElement">
+              <img
+                src={comment.userId.resizedProfilePicture}
+                alt=""
+                className="postProfilePicture"
+              />
+              <div>
+                <p style={{ fontWeight: "500", marginBottom: "3px" }}>
+                  @{comment.userId.userName}{" "}
+                  <span style={{ color: "#595959", fontSize: "14px" }}>
+                    {" "}
+                    {daysHappenedSinceCommented(comment.createdAt)}
+                  </span>
+                </p>
+                <p>{comment.comment}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
         </div>
       </div>
     </div>

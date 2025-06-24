@@ -1,4 +1,4 @@
-import '../css/Search.css'
+import '../styles/Search.css'
 import { IoMdSearch } from "react-icons/io";
 export default function Search() {
   return (

@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { CgProfile } from "react-icons/cg";
-import star from "../css/star.png";
-import "../css/Profile.css";
+import star from "../styles/star.png";
+import "../styles/Profile.css";
 import { toast } from "react-toastify";
 import { useLocation } from 'react-router-dom';
 export default function Profile() {
@@ -16,7 +15,7 @@ export default function Profile() {
   useEffect(() => {
     async function getPosts() {
       console.log("Current Path:", location.pathname.slice(9,));
-      const res = await fetch(`http://localhost:5000/userPosts/${window.location.pathname.split("/").pop()}`, {
+      const res = await fetch(`http://localhost:5000/api/post/userPosts/${window.location.pathname.split("/").pop()}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -43,7 +42,7 @@ export default function Profile() {
   },[]);
   
   const currentLoginUser= async() => {
-    let data = await fetch("http://localhost:5000/isLoggedIn", {
+    let data = await fetch("http://localhost:5000/api/user/isLoggedIn", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -53,7 +52,7 @@ export default function Profile() {
     data = await data.json();
     if (data.status === "SUCCESS") {
       console.log("User is logged in",data.user);
-      let profile= await fetch(`http://localhost:5000/profile/${data.user._id}`, {
+      let profile= await fetch(`http://localhost:5000/api/user/profile/${data.user._id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -78,7 +77,7 @@ export default function Profile() {
 
   const getProfile = async () => {
     console.log(window.location.pathname.split("/").pop());
-    let data = await fetch(`http://localhost:5000/profile/${window.location.pathname.split("/").pop()}`, {
+    let data = await fetch(`http://localhost:5000/api/user/profile/${window.location.pathname.split("/").pop()}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -97,13 +96,8 @@ export default function Profile() {
   };
 
   const handleUserRated = async (index, rating, postId) => {
-    let updatedPosts = [...posts];
-    updatedPosts[index].userRating = rating;
-    setPosts(() => {
-      return updatedPosts;
-    });
 
-    let postData = await fetch("http://localhost:5000/addRating", {
+    let postData = await fetch("http://localhost:5000/api/post/addRating", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -119,15 +113,21 @@ export default function Profile() {
 
     //update Live
 
-    updatedPosts = [...posts];
-    updatedPosts[index].overAllRatings =
-      (updatedPosts[index].overAllRatings * updatedPosts[index].noOfRatings +
-        rating) /
-      (updatedPosts[index].noOfRatings + 1);
-    updatedPosts[index].noOfRatings += 1;
-    setPosts(() => {
-      return updatedPosts;
-    });
+    let updatedPosts = [...posts];
+    if(updatedPosts[index].userRated===0){
+      console.log((updatedPosts[index].avgRating * updatedPosts[index].ratings.length));
+      updatedPosts[index].avgRating = ((updatedPosts[index].avgRating * updatedPosts[index].ratings.length) + rating)/(updatedPosts[index].ratings.length + 1);
+      updatedPosts[index].ratings.push({userId:user._id,rated:rating});
+    }
+    else{
+      let oldAvgRating = updatedPosts[index].avgRating;
+      let oldRating = updatedPosts[index].userRated;
+      updatedPosts[index].avgRating = ((oldAvgRating * updatedPosts[index].ratings.length) - oldRating + rating) / updatedPosts[index].ratings.length;
+    }
+    updatedPosts[index].userRated = rating;
+    console.log(updatedPosts[index]);
+
+    setPosts(updatedPosts);
   };
 
   const handleChangeProfileImage = async (e) => {
@@ -154,7 +154,7 @@ export default function Profile() {
 
 
   const handleSaveProfileImage = async () => {
-    const res = await fetch("http://localhost:5000/updateProfilePicture", {
+    const res = await fetch("http://localhost:5000/api/user/updateProfilePicture", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -190,7 +190,7 @@ export default function Profile() {
   }
 
   const handleFollowUser = async () => {
-    const res = await fetch("http://localhost:5000/followUser", {
+    const res = await fetch("http://localhost:5000/api/user/followUser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -203,6 +203,8 @@ export default function Profile() {
     const data = await res.json();
     console.log(data);
     if (data.status === "SUCCESS") {
+      setIsFollowing(true);
+      setUser({...user,followers:[...user.followers,user._id]});
       toast.success("User followed successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -273,37 +275,35 @@ export default function Profile() {
       {posts.map((post, index) => (
         <div className="post" key={index}>
           <div className="postHeader">
-            <CgProfile style={{ fontSize: "30px" }} />
-            <p>{post.userName}</p>
+            <img src={user.profilePicture} alt="" className="postProfilePicture" />
+            <p >{user.userName}</p>
           </div>
           <img src={post.image} alt="" className="postImage" />
           <div className="overAllRating">
-            <div className="ratingInfo">
-              <img src={star} alt="" className="star" />
-              <p>
-                {post.overAllRatings.toString().length > 1
-                  ? post.overAllRatings.toFixed(1)
-                  : post.overAllRatings}
-              </p>
-              <p>({post.noOfRatings})</p>
-            </div>
+              <div className="ratingInfo">
+                <img src={star} alt="" className="star" />
+                <p>{post.avgRating.toFixed(1)}</p>
+                <p>({post.ratings.length})</p>
+              </div>
           </div>
           <div className="ratingBar">
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((_, i) => (
+            {[1,2,3,4,5,6,7,8,9,10].map((_, i) => (
               <p
                 key={i}
                 className="ratingElement text-center"
                 style={{
-                  backgroundColor: post.userRating >= i + 1 ? "#e7e0ff" : "",
-                  borderTopLeftRadius: "5px",
-                  borderBottomLeftRadius: "5px",
+                  backgroundColor: post.userRated>=i+1?"#ffadd2":"",
+                  borderTopLeftRadius:"5px",
+                  borderBottomLeftRadius:"5px"
                 }}
-                onClick={() => handleUserRated(index, i + 1, post._id)}
+                onClick={() => handleUserRated(index, i + 1,post._id)}
               >
-                {i + 1}
+                {i+1}
               </p>
             ))}
           </div>
+
+          <p onClick={() => navigate(`/comments/${post._id}`)} className="commentsText">See comments</p>
         </div>
       ))}
     </div>

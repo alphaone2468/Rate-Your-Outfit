@@ -51,9 +51,10 @@
     justify-content: center;
 }
 .clickContent{
-    color: blue;
+    color: #b0306a;
     margin: 10px;
     text-align: center;
+    font-weight: 600;
 }
 .imagesSupport{
     margin: 10px;
@@ -74,6 +75,7 @@
 }
 .uploadBtn{
     padding: 10px 100px;
+    width: 300px;
 }
 .previewText{
     display: flex;
@@ -82,4 +84,32 @@
 }
 .previewImg{
     width: 350px;
+    border-radius: 6px;
+}
+@media (max-width: 600px) {
+    .uploadImgContainer{
+        padding: 20px;
+    }
+    .innerUploadImgContainer{
+        margin: 0px;
+        padding: 20px;
+    }
+    .uploadIcon{
+        width: 80px;
+        height: 80px;
+    }
+    .uploadIconContainer{
+        margin-top: 20px;
+    }
+    .uploadBtn{
+        padding: 10px 50px;
+    }
+    .previewText{
+        flex-direction: column;
+        align-items: center;
+    }
+    .previewImg{
+        width: 100%;
+    }
+    
 }

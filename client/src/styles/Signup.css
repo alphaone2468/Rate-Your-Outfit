@@ -45,3 +45,8 @@ label{
     color: #595959;
     margin-bottom: 5px;
 }
+@media (max-width:400px) {
+    .emailInput, .passwordInput, .usernameInput{
+        width: calc(100vw - 40px)!important;
+    }
+}

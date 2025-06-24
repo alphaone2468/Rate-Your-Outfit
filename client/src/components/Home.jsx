@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from "react";
-import "../css/Home.css";
-import star from "../css/star.png";
+import "../styles/Home.css";
+import star from "../styles/star.png";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
+  const [user, setUser] = useState();
   const navigate=useNavigate();
   useEffect(() => {
     async function getPosts() {
-      const res = await fetch("http://localhost:5000/getPost");
+      const res = await fetch("http://localhost:5000/api/post/getPost",{
+        method:"GET",
+        credentials:"include"
+      });
       const data = await res.json();
       console.log(data);
       // Add `userRating` to each post
-      const updatedPosts = data.map(post => ({ ...post, userRating: 0 }));
-      setPosts(updatedPosts);
+      setPosts(data);
     }
     getPosts();
   }, []);
@@ -24,7 +27,7 @@ export default function Home() {
 
 
     const getProfile = async () => {
-      let data = await fetch("http://localhost:5000/isLoggedIn", {
+      let data = await fetch("http://localhost:5000/api/user/isLoggedIn", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -33,18 +36,16 @@ export default function Home() {
       });
       data = await data.json();
       console.log(data);
-
+      setUser(data.user);
       if(data.status==="FAILED"){
         navigate("/login");
       }
     }
 
   const handleUserRated = async (index, rating,postId) => {
-    let updatedPosts = [...posts];
-    updatedPosts[index].userRating = rating;
-    setPosts(() => { return updatedPosts });
+  
 
-    let postData = await fetch("http://localhost:5000/addRating", {
+    let postData = await fetch("http://localhost:5000/api/post/addRating", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -57,13 +58,24 @@ export default function Home() {
     });
     postData = await postData.json();
     console.log(postData);
+    
+    let updatedPosts = [...posts];
+    if(updatedPosts[index].userRated===0){
+      console.log((updatedPosts[index].avgRating * updatedPosts[index].ratings.length));
+      updatedPosts[index].avgRating = ((updatedPosts[index].avgRating * updatedPosts[index].ratings.length) + rating)/(updatedPosts[index].ratings.length + 1);
+      updatedPosts[index].ratings.push({userId:user._id,rated:rating});
+    }
+    else{
+      let oldAvgRating = updatedPosts[index].avgRating;
+      let oldRating = updatedPosts[index].userRated;
+      updatedPosts[index].avgRating = ((oldAvgRating * updatedPosts[index].ratings.length) - oldRating + rating) / updatedPosts[index].ratings.length;
+    }
+    updatedPosts[index].userRated = rating;
+    console.log(updatedPosts[index]);
 
-    //update Live
+    setPosts(updatedPosts);
 
-    updatedPosts=[...posts];
-    updatedPosts[index].overAllRatings = (updatedPosts[index].overAllRatings*updatedPosts[index].noOfRatings + rating) / (updatedPosts[index].noOfRatings + 1);
-    updatedPosts[index].noOfRatings += 1;
-    setPosts(() => { return updatedPosts });
+  
 
   };
 
@@ -82,8 +94,8 @@ export default function Home() {
           <div className="overAllRating">
               <div className="ratingInfo">
                 <img src={star} alt="" className="star" />
-                <p>{(post.overAllRatings.toString().length>1) ? post.overAllRatings.toFixed(1) : post.overAllRatings}</p>
-                <p>({post.noOfRatings})</p>
+                <p>{post.avgRating.toFixed(1)}</p>
+                <p>({post.ratings.length})</p>
               </div>
           </div>
           <div className="ratingBar">
@@ -92,9 +104,9 @@ export default function Home() {
                 key={i}
                 className="ratingElement text-center"
                 style={{
-                  backgroundColor: post.userRating>=i+1?"#ffadd2":"",
-                  borderTopLeftRadius:"5px",
-                  borderBottomLeftRadius:"5px"
+                  backgroundColor: post.userRated>=i+1?"#ffadd2":"",
+                  borderRadius:"3px",
+                  boxShadow:"1px 1px 5px rgba(0,0,0,0.1)"
                 }}
                 onClick={() => handleUserRated(index, i + 1,post._id)}
               >

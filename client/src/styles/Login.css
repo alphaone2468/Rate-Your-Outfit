@@ -38,6 +38,14 @@
 .passwordInput:focus{
     outline: none;
 }
+@media (max-width:400px) {
+    .emailInput, .passwordInput{
+        padding: 7px;
+        width: calc(100vw - 40px)!important;
+        border-radius: 5px;
+         padding: 13px;
+    }
+}
 
 
 

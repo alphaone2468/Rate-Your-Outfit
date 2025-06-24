@@ -25,17 +25,30 @@ function App() {
             fontFamily: 'Lato, sans-serif',
             boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)',
             borderRadius: '8px',
-            backgroundColor: 'lightgray', //more light color
           },
           success: {
             duration: 3000,
             theme: {
               primary: '#4aed89',
             },
+            style: {
+              color: 'green',
+              backgroundColor: 'white',
+              border: '1px solid green',
+            },
+          },
+          error: {
+            duration: 3000,
+            theme: {
+              primary: 'pink',
+            },
+            style: {
+              color: 'red',
+              backgroundColor: 'white',
+              border: '1px solid red',
+            },
           },
         }}
-        
-      
       />
       <Navbar/>
       <Routes>
