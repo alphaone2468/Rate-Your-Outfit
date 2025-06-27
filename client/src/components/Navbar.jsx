@@ -4,11 +4,13 @@ import { MdLogout } from "react-icons/md";
 import { useNavigate } from "react-router-dom"; 
 import { useEffect, useState } from "react"; 
 import {toast} from "react-hot-toast"; 
+import { useLocation } from "react-router-dom";
  
 export default function Navbar() { 
   const navigate = useNavigate(); 
   const [user,setUser]=useState({}); 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showAllMenu, setShowAllMenu] = useState(true);
  
   const handleLogout = async () => { 
     const res = await fetch("http://localhost:5000/api/user/logout", { 
@@ -29,11 +31,12 @@ export default function Navbar() {
     } 
   } 
  
- 
-  const currentLoginUser = async () => { 
-    let data = await fetch("http://localhost:5000/api/user/isLoggedIn", { 
-      method: "GET", 
-      headers: { 
+
+
+  const currentLoginUser = async () => {
+    let data = await fetch("http://localhost:5000/api/user/isLoggedIn", {
+      method: "GET",
+      headers: {
         "Content-Type": "application/json", 
       }, 
       credentials: "include", 
@@ -42,6 +45,7 @@ export default function Navbar() {
     console.log(data); 
  
     if (data.status === "FAILED") { 
+      setShowAllMenu(false);
       navigate("/login"); 
     } else { 
       navigate(`/profile/${data.user._id}`); 
@@ -67,10 +71,13 @@ export default function Navbar() {
           <span></span>
           <span></span>
         </div>
-
+      
         <ul className={`navbar-links ${isMenuOpen ? 'active' : ''}`}> 
           <li> 
             <Link to="/upload" onClick={closeMenu}>Upload</Link> 
+          </li> 
+          <li> 
+            <Link to="/search" onClick={closeMenu}>Search</Link> 
           </li> 
           <li> 
             <p onClick={() => {currentLoginUser(); closeMenu();}}>Profile</p> 

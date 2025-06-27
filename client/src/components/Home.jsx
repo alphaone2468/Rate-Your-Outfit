@@ -7,6 +7,7 @@ export default function Home() {
   const [posts, setPosts] = useState([]);
   const [user, setUser] = useState();
   const navigate=useNavigate();
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     async function getPosts() {
       const res = await fetch("http://localhost:5000/api/post/getPost",{
@@ -17,6 +18,7 @@ export default function Home() {
       console.log(data);
       // Add `userRating` to each post
       setPosts(data);
+      setLoading(false);
     }
     getPosts();
   }, []);
@@ -81,6 +83,7 @@ export default function Home() {
 
   return (
     <div className="HomeContainer">
+      {loading && <p>Loading</p>}
       {posts.map((post, index) => (
         <div className="post" key={index}>
           <div className="postHeader">

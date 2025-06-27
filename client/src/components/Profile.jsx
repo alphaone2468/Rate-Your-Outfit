@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import star from "../styles/star.png";
 import "../styles/Profile.css";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 import { useLocation } from 'react-router-dom';
 export default function Profile() {
   const [posts, setPosts] = useState([]);

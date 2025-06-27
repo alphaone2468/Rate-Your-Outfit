@@ -91,7 +91,6 @@ router.post("/updateProfilePicture", async (req, res) => {
         const base64Data = profilePicture.replace(/^data:image\/\w+;base64,/, '');
         const buffer = Buffer.from(base64Data, 'base64');
 
-        const outputPath = path.join(__dirname, 'resized', `resized-${Date.now()}.jpg`);
         const resizedBuffer = await sharp(buffer)
             .resize({ width: 800 })
             .jpeg({ quality: 30 })
@@ -144,6 +143,27 @@ router.post("/unfollowUser", async (req, res) => {
         await User.updateOne({ _id: req.user._id }, { $pull: { following: req.body.followingId } });
         await User.updateOne({ _id: req.body.followingId }, { $pull: { followers: req.user._id } });
         return res.status(200).json({ status: "SUCCESS", message: "User unfollowed successfully" });
+    } catch (e) {
+        console.log(e);
+        return res.status(500).json({ status: "FAILED", message: "Internal Server Error" });
+    }
+});
+
+
+router.get("/search", async (req, res) => {
+    try {
+        const searchQuery = req.query.name;
+        if (!searchQuery) {
+            return res.status(400).json({ status: "FAILED", message: "Search query is required" });
+        }
+        const users = await User.find({
+            $or: [
+                { userName: { $regex: searchQuery, $options: 'i' } },
+                { email: { $regex: searchQuery, $options: 'i' } }
+            ]
+        }, { _id:1,userName:1,email:1,resizedProfilePicture:1 }).lean();
+
+        return res.status(200).json({ status: "SUCCESS", users });
     } catch (e) {
         console.log(e);
         return res.status(500).json({ status: "FAILED", message: "Internal Server Error" });

@@ -10,6 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import {Routes,Route,Link} from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import Comments from './components/Comments'
+import Loading from './components/Loading'
 function App() {
 
   return (
@@ -27,25 +28,25 @@ function App() {
             borderRadius: '8px',
           },
           success: {
-            duration: 3000,
+            duration: 30000,
             theme: {
               primary: '#4aed89',
             },
             style: {
               color: 'green',
-              backgroundColor: 'white',
-              border: '1px solid green',
+              // border: '1px solid green',
+              backgroundColor:"#e7ffe7"
             },
           },
           error: {
-            duration: 3000,
+            duration: 30000,
             theme: {
               primary: 'pink',
             },
             style: {
               color: 'red',
-              backgroundColor: 'white',
-              border: '1px solid red',
+              backgroundColor:"#fedddd"
+
             },
           },
         }}
@@ -59,7 +60,10 @@ function App() {
         <Route path='/search' element={<Search/>}/>
         <Route path='/profile/:id' element={<Profile/>}/>
         <Route path='/comments/:id' element={<Comments/>}/>
+        <Route path="/loading" element={<Loading/>}/>
       </Routes>
+
+
 
 
 
