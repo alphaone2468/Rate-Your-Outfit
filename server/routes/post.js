@@ -3,21 +3,11 @@ const jwt = require("jsonwebtoken");
 const Post = require("../models/post.model");
 const sharp = require("sharp");
 const path = require("path");
+const verifyToken = require("../middleware/verifyToken");
 
-router.get("/getPost", async (req, res) => {
+router.get("/getPost", verifyToken, async (req, res) => {
     try {
-        console.log("cookie", req.cookies.access_token);
-        let user;
-        jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
-            if (err) {
-                console.log("err", err);
-                return res.status(401).json({ status: "FAILED", message: "Failed to verify Token please login" });
-            } else {
-                console.log("data", data);
-                req.user = data;
-            }
-        });
-        console.log(req.user);
+        
         const posts = await Post.find().populate("userId", "userName resizedProfilePicture").limit(10);
 
         for (let i = 0; i < posts.length; i++) {
@@ -46,7 +36,7 @@ router.get("/getPost", async (req, res) => {
 });
 
 
-router.get("/userPosts/:id", async (req, res) => {
+router.get("/userPosts/:id",verifyToken, async (req, res) => {
     console.log("cookie", req.cookies.access_token);
     jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
         if (err) {
@@ -87,19 +77,7 @@ router.get("/userPosts/:id", async (req, res) => {
     }
 })
 
-router.post("/addPost", async (req, res) => {
-    // console.log(req.body);
-    console.log("cookie", req.cookies.access_token);
-    let user;
-    jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
-        if (err) {
-            console.log("err", err);
-        }
-        else {
-            console.log("data", data);
-            req.user = data;
-        }
-    })
+router.post("/addPost", verifyToken, async (req, res) => {
     try {
         let obj = { ...req.body, userId: req.user._id, userName: req.user.userName };
         let post = await new Post(obj);
@@ -113,7 +91,7 @@ router.post("/addPost", async (req, res) => {
 })
 
 
-router.post('/upload-base64', async (req, res) => {
+router.post('/upload-base64',verifyToken, async (req, res) => {
     try {
         const { imageBase64 } = req.body;
 
@@ -139,7 +117,7 @@ router.post('/upload-base64', async (req, res) => {
 
 //comments
 
-router.get("/getComments/:postId", async (req, res) => {
+router.get("/getComments/:postId",verifyToken, async (req, res) => {
     try {
         //want to poulate userId as well
         let post = await Post.findById(req.params.postId).populate("comments.userId", "userName resizedProfilePicture").populate("userId", "userName resizedProfilePicture");
@@ -153,18 +131,7 @@ router.get("/getComments/:postId", async (req, res) => {
     }
 });
 
-router.post("/addComment", async (req, res) => {
-    console.log("cookie", req.cookies.access_token);
-    let user;
-    jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
-        if (err) {
-            console.log("err", err);
-            return res.status(401).json({ status: "FAILED", message: "Failed to verify Token please login" });
-        } else {
-            console.log("data", data);
-            req.user = data;
-        }
-    });
+router.post("/addComment", verifyToken , async (req, res) => {
     try {
         let post = await Post.findById(req.body.postId);
         if (!post) {
@@ -180,19 +147,8 @@ router.post("/addComment", async (req, res) => {
 });
 
 
-router.post("/addRating", async (req, res) => {
+router.post("/addRating",verifyToken, async (req, res) => {
     try {
-        console.log("cookie", req.cookies.access_token);
-        let user;
-        jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
-            if (err) {
-                console.log("err", err);
-                return res.status(401).json({ status: "FAILED", message: "Failed to verify Token please login" });
-            } else {
-                console.log("data", data);
-                req.user = data;
-            }
-        });
         const post = await Post.findOne({ _id: req.body.postId }, { ratings: 1 });
         const userIds = post.ratings.map((e) => e.userId.toString());
 

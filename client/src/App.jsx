@@ -11,6 +11,7 @@ import {Routes,Route,Link} from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import Comments from './components/Comments'
 import Loading from './components/Loading'
+import NotFound from './components/NotFound'
 function App() {
 
   return (
@@ -28,7 +29,7 @@ function App() {
             borderRadius: '8px',
           },
           success: {
-            duration: 30000,
+            duration: 3000,
             theme: {
               primary: '#4aed89',
             },
@@ -39,7 +40,7 @@ function App() {
             },
           },
           error: {
-            duration: 30000,
+            duration: 3000,
             theme: {
               primary: 'pink',
             },
@@ -61,6 +62,7 @@ function App() {
         <Route path='/profile/:id' element={<Profile/>}/>
         <Route path='/comments/:id' element={<Comments/>}/>
         <Route path="/loading" element={<Loading/>}/>
+        <Route path='*' element={<NotFound/>}/>
       </Routes>
 
 

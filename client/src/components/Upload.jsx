@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "../styles/Upload.css";
 import { MdOutlineDriveFolderUpload } from "react-icons/md";
 import { CiCircleRemove } from "react-icons/ci";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function Upload() {
   const [img,setImg]=useState("");
@@ -10,6 +11,31 @@ export default function Upload() {
   const [uploadBtnStyle,setUploadBtnStyle]=useState({
       boxShadow:"6px 6px black",
     })
+
+    const navigate = useNavigate();
+
+
+      useEffect(()=>{
+        getProfile();
+      },[])
+    
+    
+        const getProfile = async () => {
+          let data = await fetch("http://localhost:5000/api/user/isLoggedIn", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          });
+          data = await data.json();
+          console.log(data);
+          if(data.status==="FAILED"){
+            navigate("/login");
+          }
+        }
+
+
   const handlePreviewImage = async(e) =>{
     const file=e.target.files[0];
     if(file.size > 10*1024*1024){ 

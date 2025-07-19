@@ -3,9 +3,15 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const sharp = require("sharp");
 const path=require("multer");
+const verifyToken = require("../middleware/verifyToken");
 
 router.post("/login", async (req, res) => {
     console.log(req.body);
+
+    let existingUser=await User.find({email:req.body.email});
+    if(existingUser.length===0){
+        return res.status(404).json({status:"FAILED",message:"User with this email does not exist"});
+    }
     let user = await User.findOne({ email: req.body.email, password: req.body.password }, { password: 0, profilePicture: 0, resizedProfilePicture: 0 }).lean();
     if (user) {
         jwt.sign(user, process.env.JWT_SECRET, { expiresIn: 3000 }, (err, token) => {
@@ -42,6 +48,16 @@ router.get("/isLoggedIn", (req, res) => {
 
 router.post("/signup", async (req, res) => {
     try {
+        console.log(req.body);
+
+        let existingUserWithEmail = await User.findOne({ email: req.body.email });
+        if (existingUserWithEmail) {
+            return res.status(409).json({ status: "FAILED", message: "User with this email already exists" });
+        }
+        let existingUserWithUserName = await User.findOne({ userName: req.body.userName });
+        if (existingUserWithUserName) {
+            return res.status(409).json({ status: "FAILED", message: "User with this username already exists" });
+        }
         let data = await new User(req.body);
         data = await data.save();
         console.log(data);
@@ -54,7 +70,7 @@ router.post("/signup", async (req, res) => {
 })
 
 
-router.get("/profile/:id", async (req, res) => {
+router.get("/profile/:id",verifyToken, async (req, res) => {
     try {
         let user = await User.findById(req.params.id, { password: 0 });
         if (user) {
@@ -71,7 +87,7 @@ router.get("/profile/:id", async (req, res) => {
 })
 
 
-router.post("/updateProfilePicture", async (req, res) => {
+router.post("/updateProfilePicture",verifyToken, async (req, res) => {
     console.log("cookie", req.cookies.access_token);
     let user;
     jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
@@ -106,7 +122,7 @@ router.post("/updateProfilePicture", async (req, res) => {
 });
 
 
-router.post("/followUser", async (req, res) => {
+router.post("/followUser",verifyToken, async (req, res) => {
     console.log("cookie", req.cookies.access_token);
     let user;
     jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
@@ -127,7 +143,7 @@ router.post("/followUser", async (req, res) => {
         return res.status(500).json({ status: "FAILED", message: "Internal Server Error" });
     }
 });
-router.post("/unfollowUser", async (req, res) => {
+router.post("/unfollowUser",verifyToken, async (req, res) => {
     console.log("cookie", req.cookies.access_token);
     let user;
     jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
@@ -150,7 +166,7 @@ router.post("/unfollowUser", async (req, res) => {
 });
 
 
-router.get("/search", async (req, res) => {
+router.get("/search",verifyToken, async (req, res) => {
     try {
         const searchQuery = req.query.name;
         if (!searchQuery) {

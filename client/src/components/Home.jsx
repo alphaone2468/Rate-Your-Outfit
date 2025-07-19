@@ -84,7 +84,7 @@ export default function Home() {
   return (
     <div className="HomeContainer">
       {loading && <p>Loading</p>}
-      {posts.map((post, index) => (
+      {posts?.map((post, index) => (
         <div className="post" key={index}>
           <div className="postHeader">
             <img src={post.userId.resizedProfilePicture} alt="" className="postProfilePicture" />

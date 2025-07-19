@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../styles/Signup.css";
 import { useNavigate } from "react-router-dom";
+import {toast} from "react-hot-toast"
 export default function SignUp() {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
@@ -57,7 +58,7 @@ export default function SignUp() {
         navigate("/login");
       } else {
         // add toast
-        setErrors({ server: data.message || "Signup failed" });
+        toast.error(data.message || "Signup failed");
       }
     }
   };

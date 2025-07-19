@@ -67,20 +67,6 @@ function Login() {
 
 
 
-  const getProfile = async () => {
-    if (true) {
-      let data = await fetch("http://localhost:5000/api/user/profile", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-      data = await data.json();
-      console.log(data);
-    }
-  };
-
   return (
     <>
       <div className="loginContainer">
