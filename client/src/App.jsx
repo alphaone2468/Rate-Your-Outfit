@@ -12,6 +12,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import Comments from './components/Comments'
 import Loading from './components/Loading'
 import NotFound from './components/NotFound'
+import ProtectedRoute from './components/ProtectedRoute'
+
 function App() {
 
   return (
@@ -54,29 +56,21 @@ function App() {
       />
       <Navbar/>
       <Routes>
-        <Route path='/' element={<Home />}/>
+        <Route path='/' element={<ProtectedRoute>
+          <Home />
+        </ProtectedRoute>}
+        />
         <Route path='/login' element={<Login/>}/>
         <Route path='/signup' element={<SignUp/>}/>
-        <Route path='/upload' element={<Upload/>}/>
-        <Route path='/search' element={<Search/>}/>
-        <Route path='/profile/:id' element={<Profile/>}/>
-        <Route path='/comments/:id' element={<Comments/>}/>
+        <Route path='/upload' element={<ProtectedRoute><Upload/></ProtectedRoute>}/>
+        <Route path='/search' element={<ProtectedRoute><Search/></ProtectedRoute>}/>
+        <Route path='/profile/:id' element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
+        <Route path='/comments/:id' element={<ProtectedRoute><Comments/></ProtectedRoute>}/>
         <Route path="/loading" element={<Loading/>}/>
         <Route path='*' element={<NotFound/>}/>
       </Routes>
 
 
-
-
-
-      {/* <Login/> */}
-      {/* <SignUp/> */}
-      {/* <Upload/> */}
-      
-
-      {/* <Home/> */}
-
-      {/* <Search/> */}
     </>
   )
 }

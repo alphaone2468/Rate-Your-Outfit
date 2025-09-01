@@ -15,25 +15,6 @@ export default function Upload() {
     const navigate = useNavigate();
 
 
-      useEffect(()=>{
-        getProfile();
-      },[])
-    
-    
-        const getProfile = async () => {
-          let data = await fetch("http://localhost:5000/api/user/isLoggedIn", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          });
-          data = await data.json();
-          console.log(data);
-          if(data.status==="FAILED"){
-            navigate("/login");
-          }
-        }
 
 
   const handlePreviewImage = async(e) =>{

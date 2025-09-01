@@ -66,10 +66,17 @@ export default function Comments() {
 
   useEffect(() => {
     const fetchComments = async () => {
-      const response = await fetch(
-        `http://localhost:5000/api/post/getComments/${postId}`
+      const response = await fetch(`http://localhost:5000/api/post/getComments/${postId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
       );
       const data = await response.json();
+      console.log(data);
       if (data.status === "SUCCESS") {
         const sortedComments = [...data.post.comments].sort((a, b) => {
           return new Date(b.createdAt) - new Date(a.createdAt);
@@ -78,6 +85,7 @@ export default function Comments() {
         setComments(sortedComments);
         setPost(data.post);
       } else {
+        console.log("I am here")
         toast.error(data.message);
       }
     };

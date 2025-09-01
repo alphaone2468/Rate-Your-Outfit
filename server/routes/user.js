@@ -4,43 +4,56 @@ const User = require("../models/user.model");
 const sharp = require("sharp");
 const path=require("multer");
 const verifyToken = require("../middleware/verifyToken");
+const bcrypt=require("bcrypt");
 
 router.post("/login", async (req, res) => {
-    console.log(req.body);
+    try {
+        const { email, password } = req.body;
 
-    let existingUser=await User.find({email:req.body.email});
-    if(existingUser.length===0){
-        return res.status(404).json({status:"FAILED",message:"User with this email does not exist"});
-    }
-    let user = await User.findOne({ email: req.body.email, password: req.body.password }, { password: 0, profilePicture: 0, resizedProfilePicture: 0 }).lean();
-    if (user) {
-        jwt.sign(user, process.env.JWT_SECRET, { expiresIn: 3000 }, (err, token) => {
+        const existingUser = await User.findOne({ email }).lean();
+        if (!existingUser) {
+            return res.status(404).json({ status: "FAILED", message: "User with this email does not exist" });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ status: "FAILED", message: "Invalid password" });
+        }
+        console.log("existing user", existingUser);
+
+        const { password: _,profilePicture,resizedProfilePicture, ...userWithoutSensitive } = existingUser;
+
+        jwt.sign(userWithoutSensitive, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
             if (err) {
-                console.log(err);
-                res.status(500).json({ status: "FAILED", message: "Error in generating token" });
-            } else {
-                console.log("Generated token:", token);
-                res.cookie("access_token", token, {
-                    httpOnly: true,
-                    sameSite: "lax",
-                    secure: false
-                });
-                res.status(200).json({ status: "SUCCESS", user: user });
+                return res.status(500).json({ status: "FAILED", message: "Error generating token" });
             }
+
+            res.cookie("access_token", token, {
+                httpOnly: true,
+                sameSite: "lax",
+                secure: false
+            });
+
+            delete existingUser.password; // Remove password from the response
+
+            res.status(200).json({ status: "SUCCESS", user: existingUser });
         });
-    } else {
-        res.status(401).json({ status: "FAILED", message: "Invalid password" });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ status: "FAILED", message: "Internal server error" });
     }
 });
 
-router.get("/isLoggedIn", (req, res) => {
-    console.log("whatch this", req.cookies);
-    jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, (err, data) => {
+router.get("/isLoggedIn",(req, res) => {
+    console.log("watch this", req.cookies);
+    jwt.verify(req.cookies.access_token, process.env.JWT_SECRET, async(err, data) => {
         if (err) {
             res.status(401).json({ status: "FAILED", message: "Failed to verify Token please login" })
         }
         else {
-            res.status(200).json({ status: "SUCCESS", user: data });
+            const user=await User.findById(data._id, { password: 0 }).lean();
+            res.status(200).json({ status: "SUCCESS", user: user });
         }
     })
 })
@@ -58,10 +71,15 @@ router.post("/signup", async (req, res) => {
         if (existingUserWithUserName) {
             return res.status(409).json({ status: "FAILED", message: "User with this username already exists" });
         }
-        let data = await new User(req.body);
-        data = await data.save();
-        console.log(data);
-        res.status(201).json({ status: "SUCCESS", user: data });
+        let hashedPassword = await bcrypt.hash(req.body.password,10); 
+        const user={...req.body,password:hashedPassword}
+        let savedUser = await new User(user);
+        savedUser = await savedUser.save();
+        console.log(savedUser);
+        savedUser=savedUser.toObject();
+        delete savedUser._id
+        delete savedUser.password
+        res.status(201).json({ status: "SUCCESS", user: savedUser });
     }
     catch (e) {
         console.log(error);

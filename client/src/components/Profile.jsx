@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import star from "../styles/star.png";
 import "../styles/Profile.css";
 import { toast } from "react-hot-toast";
 import { useLocation } from 'react-router-dom';
+import { UserContext } from "../context/UserContext";
 export default function Profile() {
   const [posts, setPosts] = useState([]);
   const [user, setUser] = useState({});
@@ -12,6 +13,10 @@ export default function Profile() {
   const [loginUser, setLoginUser] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
+  const getUser = useContext(UserContext);
+
+
+
   useEffect(() => {
     async function getPosts() {
       console.log("Current Path:", location.pathname.slice(9,));
@@ -39,7 +44,7 @@ export default function Profile() {
 
   useEffect(() => {
     currentLoginUser();
-  },[]);
+  },[getUser.user]);
   
   const currentLoginUser= async() => {
     let data = await fetch("http://localhost:5000/api/user/isLoggedIn", {
@@ -49,25 +54,23 @@ export default function Profile() {
       },
       credentials: "include",
     });
-    data = await data.json();
-    if (data.status === "SUCCESS") {
-      console.log("User is logged in",data.user);
-      let profile= await fetch(`http://localhost:5000/api/user/profile/${data.user._id}`, {
+    data = getUser.user;
+    console.log("User is logged in",data);
+    let profile= await fetch(`http://localhost:5000/api/user/profile/${data._id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
       });
-      profile = await profile.json();
-      if (profile.status === "SUCCESS") {
+    profile = await profile.json();
+    if (profile.status === "SUCCESS") {
         setLoginUser(profile.user);
         console.log("Profile fetched successfully",profile.user);
         console.log("have alook",window.location.pathname.split("/").pop());
         if(profile.user.following.includes(window.location.pathname.split("/").pop())){
           setIsFollowing(true);
         }
-      }
     }
   };
 
@@ -117,7 +120,7 @@ export default function Profile() {
     if(updatedPosts[index].userRated===0){
       console.log((updatedPosts[index].avgRating * updatedPosts[index].ratings.length));
       updatedPosts[index].avgRating = ((updatedPosts[index].avgRating * updatedPosts[index].ratings.length) + rating)/(updatedPosts[index].ratings.length + 1);
-      updatedPosts[index].ratings.push({userId:user._id,rated:rating});
+      updatedPosts[index].ratings.push({userId:getUser.user._id,rated:rating});
     }
     else{
       let oldAvgRating = updatedPosts[index].avgRating;

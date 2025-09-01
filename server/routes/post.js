@@ -7,31 +7,71 @@ const verifyToken = require("../middleware/verifyToken");
 
 router.get("/getPost", verifyToken, async (req, res) => {
     try {
+        // Extract pagination parameters from query string
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
         
-        const posts = await Post.find().populate("userId", "userName resizedProfilePicture").limit(10);
+        // Calculate the number of posts to skip
+        const skip = (page - 1) * limit;
+        
+        // Validate pagination parameters
+        if (page < 1 || limit < 1 || limit > 50) {
+            return res.status(400).json({ 
+                status: "ERROR",
+                message: "Invalid pagination parameters. Page must be >= 1, limit must be between 1-50" 
+            });
+        }
 
+        // Get total count for pagination info (optional)
+        const totalPosts = await Post.countDocuments();
+        
+        // Fetch posts with pagination, sorting by creation date (newest first)
+        const posts = await Post.find()
+            .populate("userId", "userName resizedProfilePicture")
+            .sort({ createdAt: -1 }) // Sort by newest first
+            .skip(skip)
+            .limit(limit);
+            
+        // Process posts to add user rating and average rating
         for (let i = 0; i < posts.length; i++) {
             const postObj = posts[i].toObject();
-
             const userRatedObj = postObj.ratings.find(
                 (e) => e.userId.toString() === req.user._id.toString()
             );
             postObj.userRated = userRatedObj ? userRatedObj.rated : 0;
-
             const ratings = postObj.ratings.map((r) => r.rated);
             postObj.avgRating = ratings.length > 0
                 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length)
                 : 0;
-
             posts[i] = postObj;
         }
 
-        return res.status(200).json(posts);
+        // Calculate pagination metadata
+        const totalPages = Math.ceil(totalPosts / limit);
+        const hasNextPage = page < totalPages;
+        const hasPrevPage = page > 1;
 
-
+        return res.status(200).json({
+            status: "SUCCESS",
+            posts,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalPosts,
+                postsPerPage: limit,
+                hasNextPage,
+                hasPrevPage,
+                nextPage: hasNextPage ? page + 1 : null,
+                prevPage: hasPrevPage ? page - 1 : null
+            }
+        });
+        
     } catch (e) {
         console.error(e);
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ 
+            status: "ERROR",
+            message: "Internal Server Error" 
+        });
     }
 });
 

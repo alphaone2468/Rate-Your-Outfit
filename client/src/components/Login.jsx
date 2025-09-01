@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "../styles/Login.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import { UserContext } from "../context/UserContext";
 
 
 function Login() {
@@ -9,6 +10,11 @@ function Login() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const navigate=useNavigate();
+
+  const useUser=useContext(UserContext);
+
+  console.log(useUser);
+
 
   const [loginBtnStyle,setLoginBtnStyle]=useState({
     boxShadow:"6px 6px black",
@@ -54,6 +60,7 @@ function Login() {
       data = await data.json();
       console.log(data);
 
+      useUser.setUser(data.user);
       if(data.status==="SUCCESS"){
         toast.success("Login Successful");
         navigate("/");

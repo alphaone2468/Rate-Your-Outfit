@@ -5,6 +5,10 @@
   font-family: "Roboto", sans-serif;
 }
 
+body{
+  overflow-x: hidden;
+}
+
 .heading{
   font-family: 'Lato';
 }
